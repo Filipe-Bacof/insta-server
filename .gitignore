@@ -1,2 +1,6 @@
 node_modules
 .env
+uploads/photos/*
+uploads/users/*
+!uploads/photos/.gitkeep
+!uploads/users/.gitkeep
