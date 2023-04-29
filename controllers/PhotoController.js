@@ -135,7 +135,41 @@ const updatePhoto = async (req, res) => {
         res.status(404).json({ errors: ["Foto não encontrada!"] });
         return;
     }
+}
 
+// Like functionality
+const likePhoto = async (req, res) => {
+    const { id } = req.params;
+    const reqUser = req.user;
+
+    try {
+        const photo = await Photo.findById(id);
+
+        // Check if photo exists
+        if (!photo) {
+            res.status(404).json({ errors: ["Foto não encontrada!"] });
+            return;
+        }
+    
+        // Check if user already liked the photo
+        if (photo.likes.includes(reqUser._id)) {
+            res.status(422).json({ errors: ["Você já curtiu essa foto."] });
+            return;
+        }
+    
+        // Put the user ID in likes array
+        photo.likes.push(reqUser._id);
+
+        res.status(200).json({
+            photoId: id,
+            userId: reqUser._id,
+            message: "A foto foi curtida."
+        });
+
+    } catch (error) {
+        res.status(404).json({ errors: ["Foto não encontrada!"] });
+        return;
+    }
 }
 
 module.exports = {
@@ -145,4 +179,5 @@ module.exports = {
     getUserPhotos,
     getPhotoById,
     updatePhoto,
+    likePhoto,
 };
