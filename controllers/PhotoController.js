@@ -68,6 +68,15 @@ const getAllPhotos = async (req, res) => {
     const photos = await Photo.find({}).sort([["createdAt", -1]]).exec();
 
     return res.status(200).json(photos);
+}
+
+// get user photos
+const getUserPhotos = async (req, res) => {
+    const { id } = req.params;
+
+    const photos = await Photo.find({userId: id}).sort([["createdAt", -1]]).exec();
+
+    return res.status(200).json(photos);
 
 }
 
@@ -75,4 +84,5 @@ module.exports = {
     insertPhoto,
     deletePhoto,
     getAllPhotos,
+    getUserPhotos,
 };
