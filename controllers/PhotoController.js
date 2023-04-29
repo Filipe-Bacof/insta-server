@@ -16,14 +16,14 @@ const insertPhoto = async (req, res) => {
         image,
         title,
         userId: user._id,
-        userName: user.name
+        userName: user.name,
     });
 
     // If photo was created successfully, return data
     if (!newPhoto) {
         res.status(422).json({
-            errors: ["Houve um problema, por favor tente novamente mais tarde."]
-        })
+            errors: ["Houve um problema, por favor tente novamente mais tarde."],
+        });
         return;
     }
 
@@ -41,48 +41,72 @@ const deletePhoto = async (req, res) => {
 
         // check if photo exists
         if (!photo) {
-            res.status(404).json({errors: ["Foto não encontrada!"]})
+            res.status(404).json({ errors: ["Foto não encontrada!"] });
             return;
         }
-    
+
         // check if photo belongs to user
         if (!photo.userId.equals(reqUser._id)) {
-            res.status(422).json({errors: ["Ocorreu um erro, por favor tente novamente mais tarde!"]})
+            res.status(422).json({ errors: ["Ocorreu um erro, por favor tente novamente mais tarde!"] });
             return;
         }
-    
+
         await Photo.findByIdAndDelete(photo._id);
-    
+
         res.status(200).json({
             id: photo._id,
-            message: "Foto excluída com sucesso."
+            message: "Foto excluída com sucesso.",
         });
     } catch (error) {
-        res.status(404).json({errors: ["Foto não encontrada!"]})
+        res.status(404).json({ errors: ["Foto não encontrada!"] });
         return;
     }
-}
+};
 
 // get all photos
 const getAllPhotos = async (req, res) => {
-    const photos = await Photo.find({}).sort([["createdAt", -1]]).exec();
+    const photos = await Photo.find({})
+        .sort([["createdAt", -1]])
+        .exec();
 
     return res.status(200).json(photos);
-}
+};
 
 // get user photos
 const getUserPhotos = async (req, res) => {
     const { id } = req.params;
 
-    const photos = await Photo.find({userId: id}).sort([["createdAt", -1]]).exec();
+    const photos = await Photo.find({ userId: id })
+        .sort([["createdAt", -1]])
+        .exec();
 
     return res.status(200).json(photos);
+};
 
-}
+// get photo by id
+const getPhotoById = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const photo = await Photo.findById(new mongoose.Types.ObjectId(id));
+
+        // check if photo exists
+        if (!photo) {
+            res.status(404).json({ errors: ["Foto não encontrada!"] });
+            return;
+        }
+
+        return res.status(200).json(photo);
+    } catch (error) {
+        res.status(404).json({ errors: ["Foto não encontrada!"] });
+        return;
+    }
+};
 
 module.exports = {
     insertPhoto,
     deletePhoto,
     getAllPhotos,
     getUserPhotos,
+    getPhotoById,
 };
